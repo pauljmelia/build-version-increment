@@ -56,7 +56,7 @@ namespace BuildVersionIncrement.Incrementors
 			Logger.Write($"Located {types.Count} incrementors.", LogLevel.Debug);
 
 			foreach (var t in types.Where(t => t != typeof(BuiltInIncrementors.NoneIncrementor))) {
-				Logger.Write($"Creating instance of incrementor type \"{t.FullName}\".");
+				Logger.Write($"Creating instance of incrementor type \"{t.FullName}\".", LogLevel.Debug);
 				var incrementor = (IncrementorBase)Activator.CreateInstance(t);
 
 				_incrementors.Add(incrementor.Name, incrementor);

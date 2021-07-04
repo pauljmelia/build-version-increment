@@ -3,7 +3,7 @@
 // Module Name: BuildVersionIncrementPackage.cs
 // ----------------------------------------------------------------------
 // Created and maintained by Paul J. Melia.
-// Copyright © 2016 Paul J. Melia.
+// Copyright © 2019 Paul J. Melia.
 // All rights reserved.
 // ----------------------------------------------------------------------
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
@@ -25,7 +25,7 @@ namespace BuildVersionIncrement
 	using System.Diagnostics.CodeAnalysis;
 	using System.Runtime.InteropServices;
 	using System.Threading;
-	using System.Threading.Tasks;
+
 	using Commands;
 
 	using EnvDTE;
@@ -37,6 +37,8 @@ namespace BuildVersionIncrement
 	using Microsoft.VisualStudio.Shell;
 	using Microsoft.VisualStudio.Shell.Interop;
 
+	using Task = System.Threading.Tasks.Task;
+
 	[PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
 	[InstalledProductRegistration("#110", "#112", "1.0", IconResourceID = 400)]
 
@@ -45,15 +47,23 @@ namespace BuildVersionIncrement
 	[Guid(PackageGuidString)]
 	[SuppressMessage("StyleCop.CSharp.DocumentationRules",
 		"SA1650:ElementDocumentationMustBeSpelledCorrectly",
-		Justification = "pkgdef, VS and vsixmanifest are valid VS terms")]	
-	[ProvideAppCommandLine("IncrementVersion", typeof(BuildVersionIncrementPackage), Arguments = "0", DemandLoad = 1, PackageGuid = PackageGuidString)]
+		Justification = "pkgdef, VS and vsixmanifest are valid VS terms")]
+	[ProvideAppCommandLine("IncrementVersion",
+		typeof(BuildVersionIncrementPackage),
+		Arguments = "0",
+		DemandLoad = 1,
+		PackageGuid = PackageGuidString)]
+	[ProvideAutoLoad(UIContextGuids.SolutionExists, PackageAutoLoadFlags.BackgroundLoad)]
+	[ProvideAutoLoad(UIContextGuids.NoSolution, PackageAutoLoadFlags.BackgroundLoad)]
 	public sealed class BuildVersionIncrementPackage : AsyncPackage
 	{
 		public const string PackageGuidString = "d9498ed1-f738-4c84-9cbc-82ab0163d742";
 		private BuildEvents _buildEvents;
 		private BuildVersionIncrementor _buildVersionIncrementor;
 
-		private DTE DTE
+		internal bool IsCommandLine { get; set; }
+
+		private DTE Dte
 		{
 			get
 			{
@@ -62,9 +72,8 @@ namespace BuildVersionIncrement
 			}
 		}
 
-		internal bool IsCommandLine { get; set; }
-
-		protected override async System.Threading.Tasks.Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
+		protected override async Task InitializeAsync(CancellationToken cancellationToken,
+		                                              IProgress<ServiceProgressData> progress)
 		{
 			await base.InitializeAsync(cancellationToken, progress);
 
@@ -77,12 +86,14 @@ namespace BuildVersionIncrement
 			VersionCommand.Initialize(this);
 
 			_buildVersionIncrementor = new BuildVersionIncrementor(this);
-			_buildEvents = DTE.Events.BuildEvents;
+			_buildEvents = Dte.Events.BuildEvents;
 			_buildVersionIncrementor.InitializeIncrementors();
 
 #pragma warning disable VSTHRD101 // Avoid unsupported async delegates
-			_buildEvents.OnBuildBegin += async (s, e) => await _buildVersionIncrementor.OnBuildBeginAsync(s, e);
-			_buildEvents.OnBuildDone += async (s, e) => await _buildVersionIncrementor.OnBuildDoneAsync(s, e);
+			_buildEvents.OnBuildBegin += async (s, e) =>
+				                             await _buildVersionIncrementor.OnBuildBeginAsync(s, e);
+			_buildEvents.OnBuildDone += async (s, e) =>
+				                            await _buildVersionIncrementor.OnBuildDoneAsync(s, e);
 #pragma warning restore VSTHRD101 // Avoid unsupported async delegates
 		}
 
@@ -95,12 +106,10 @@ namespace BuildVersionIncrement
 
 			if (commandLine != null)
 			{
-				string optionValue;
-				commandLine.GetOption("IncrementVersion", out isPresent, out optionValue);
+				commandLine.GetOption("IncrementVersion", out isPresent, out _);
 			}
 
 			IsCommandLine = isPresent != 0;
 		}
-		
 	}
 }

@@ -55,6 +55,7 @@ namespace BuildVersionIncrement.Model
 				(BuildActionType)Enum.Parse(typeof(BuildActionType), Settings.Default.GlobalBuildAction);
 			AutoUpdateAssemblyVersion = Settings.Default.GlobalAutoUpdateAssemblyVersion;
 			AutoUpdateFileVersion = Settings.Default.GlobalAutoUpdateFileVersion;
+			//AutoUpdateVsixmanifestVersion = Settings.Default.GlobalAutoUpdateVsixmanifestVersion;
 			ReplaceNonNumerics = Settings.Default.GlobalReplaceNonNumeric;
 			IsUniversalTime = Settings.Default.GlobalUseUniversalClock;
 			IncrementBeforeBuild = Settings.Default.GlobalIncrementBeforeBuild;
@@ -68,6 +69,7 @@ namespace BuildVersionIncrement.Model
 		{
 			AutoUpdateAssemblyVersion = false;
 			AutoUpdateFileVersion = false;
+			//AutoUpdateVsixmanifestVersion = false;
 
 			BuildAction = BuildActionType.Both;
 
@@ -93,6 +95,7 @@ namespace BuildVersionIncrement.Model
 			Settings.Default.GlobalBuildAction = BuildAction.ToString();
 			Settings.Default.GlobalAutoUpdateAssemblyVersion = AutoUpdateAssemblyVersion;
 			Settings.Default.GlobalAutoUpdateFileVersion = AutoUpdateFileVersion;
+			//Settings.Default.GlobalAutoUpdateVsixmanifestVersion = AutoUpdateVsixmanifestVersion;
 			Settings.Default.GlobalStartDate = StartDate;
 			Settings.Default.GlobalReplaceNonNumeric = ReplaceNonNumerics;
 			Settings.Default.GlobalUseUniversalClock = IsUniversalTime;

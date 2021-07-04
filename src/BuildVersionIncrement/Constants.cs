@@ -21,28 +21,26 @@
 
 namespace BuildVersionIncrement
 {
-	using Xceed.Wpf.DataGrid;
+    public class Constants
+    {
+        public const int COMMAND_ID_SETTINGS = 0x0100;
+        public const int COMMAND_ID_VERSION = 0x0200;
+        public const string COMMAND_SET = "1a42bbb0-f5ad-4882-bf32-623425c6d577";
 
-	public class Constants
-	{
-		public const int COMMAND_ID_SETTINGS = 0x0100;
-		public const int COMMAND_ID_VERSION = 0x0200;
-		public const string COMMAND_SET = "1a42bbb0-f5ad-4882-bf32-623425c6d577";
+        public const string PROPERTY_LOCAL_PATH = "LocalPath";
+        public const string PROPERTY_DATE_MODIFIED = "DateModified";
+        public const string PROPERTY_FULL_PATH = "FullPath";
+        public const string PROPERTY_OUTPUT_FILE_NAME = "OutputFileName";
+        public const string PROPERTY_OUTPUT_PATH = "OutputPath";
+        public const string PROPERTY_PROJECT = "project";
 
-		public const string PROPERTY_LOCAL_PATH = "LocalPath";
-		public const string PROPERTY_DATE_MODIFIED = "DateModified";
-		public const string PROPERTY_FULL_PATH = "FullPath";
-		public const string PROPERTY_OUTPUT_FILE_NAME = "OutputFileName";
-		public const string PROPERTY_OUTPUT_PATH = "OutputPath";
-		public const string PROPERTY_PROJECT = "project";
+        public const string MEMBER_CONFIGURATIONS = "Configurations";
+        public const string MEMBER_ITEM = "Item";
+        public const string MEMBER_PRIMARY_OUTPUT = "PrimaryOutput";
 
-		public const string MEMBER_CONFIGURATIONS = "Configurations";
-		public const string MEMBER_ITEM = "Item";
-		public const string MEMBER_PRIMARY_OUTPUT = "PrimaryOutput";
-
-		public const string ATTRIBUTE_ASSEMBLY_VERSION = "AssemblyVersion";
-		public const string ATTRIBUTE_ASSEMBLY_FILE_VERSION = "AssemblyFileVersion";
-		public const string ATTRIBUTE_PRODUCT_VERSION = "ProductVersion";
-		public const string ATTRIBUTE_FILE_VERSION = "FileVersion";
-	}
+        public const string ATTRIBUTE_ASSEMBLY_VERSION = "AssemblyVersion";
+        public const string ATTRIBUTE_ASSEMBLY_FILE_VERSION = "AssemblyFileVersion";
+        public const string ATTRIBUTE_PRODUCT_VERSION = "ProductVersion";
+        public const string ATTRIBUTE_FILE_VERSION = "FileVersion";
+    }
 }

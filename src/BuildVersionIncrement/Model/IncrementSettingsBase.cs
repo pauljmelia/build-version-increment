@@ -42,6 +42,14 @@ namespace BuildVersionIncrement.Model
 		[DefaultValue(false)]
 		public bool AutoUpdateAssemblyVersion { get; set; }
 
+		//[Category("Increment Settings")]
+		//[Description(
+		//	"Auto update the version specified in a vsixmanifest file associated with the project. Note that setting this to true at the solution level or on a project which does not contain a vsixmanifest file will have no effect."
+		//)]
+		//[DisplayName("Update vsixmanifest Version")]
+		//[DefaultValue(false)]
+		//public bool AutoUpdateVsixmanifestVersion { get; set; }
+
 		[Category("Increment Settings")]
 		[Description(
 			"Auto update the file version. Note that setting this to true on solution level will have no effect on building individual projects."
@@ -102,6 +110,7 @@ namespace BuildVersionIncrement.Model
 				VersioningStyle = new VersioningStyle(source.VersioningStyle);
 				AutoUpdateAssemblyVersion = source.AutoUpdateAssemblyVersion;
 				AutoUpdateFileVersion = source.AutoUpdateFileVersion;
+				//AutoUpdateVsixmanifestVersion = source.AutoUpdateVsixmanifestVersion;
 				BuildAction = source.BuildAction;
 				DetectChanges = source.DetectChanges;
 				IncrementBeforeBuild = source.IncrementBeforeBuild;

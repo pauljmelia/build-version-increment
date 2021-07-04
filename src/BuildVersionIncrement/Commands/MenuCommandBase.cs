@@ -32,11 +32,7 @@ namespace BuildVersionIncrement.Commands
 
 		internal MenuCommandBase(Package package)
 		{
-			if (package == null)
-			{
-				throw new ArgumentNullException(nameof(package));
-			}
-			ServiceProvider = package;
+			ServiceProvider = package ?? throw new ArgumentNullException(nameof(package));
 			Initialise();
 		}
 

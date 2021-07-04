@@ -126,6 +126,10 @@ You've chosen to always apply the Global Settings, this will override any settin
     <value>BuildVersion_AssemblyInfoFilename</value>
     <comment>Global property name of the custom assemblyinfo filename.</comment>
   </data>
+  <data name="GlobalVarName_vsixmanifestFilename" xml:space="preserve">
+    <value>BuildVersion_VsixmanifestFilename</value>
+    <comment>Global property name of the custom vsixmanifest filename.</comment>
+  </data>
   <data name="GlobalVarName_buildAction" xml:space="preserve">
     <value>BuildVersion_BuildAction</value>
     <comment>Global property name that indicates at which build action to update the version.</comment>
@@ -161,6 +165,10 @@ You've chosen to always apply the Global Settings, this will override any settin
   <data name="GlobalVarName_updateFileVersion" xml:space="preserve">
     <value>BuildVersion_UpdateFileVersion</value>
     <comment>Global property name that indicates if we update the assembly file version.</comment>
+  </data>
+  <data name="GlobalVarName_updateVsixmanifestVersion" xml:space="preserve">
+    <value>BuildVersion_UpdateVsixmanifestVersion</value>
+    <comment>Global property name that indicates if we update the vsixmanifest version.</comment>
   </data>
   <data name="GlobalVarName_useGlobalSettings" xml:space="preserve">
     <value>BuildVersion_UseGlobalSettings</value>

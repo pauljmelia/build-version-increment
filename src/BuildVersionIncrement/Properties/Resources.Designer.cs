@@ -161,6 +161,15 @@ namespace BuildVersionIncrement.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to BuildVersion_UpdateVsixmanifestVersion.
+        /// </summary>
+        internal static string GlobalVarName_updateVsixmanifestVersion {
+            get {
+                return ResourceManager.GetString("GlobalVarName_updateVsixmanifestVersion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to BuildVersion_UseGlobalSettings.
         /// </summary>
         internal static string GlobalVarName_useGlobalSettings {
@@ -175,6 +184,15 @@ namespace BuildVersionIncrement.Properties {
         internal static string GlobalVarName_useUniversalClock {
             get {
                 return ResourceManager.GetString("GlobalVarName_useUniversalClock", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to BuildVersion_VsixmanifestFilename.
+        /// </summary>
+        internal static string GlobalVarName_vsixmanifestFilename {
+            get {
+                return ResourceManager.GetString("GlobalVarName_vsixmanifestFilename", resourceCulture);
             }
         }
     }

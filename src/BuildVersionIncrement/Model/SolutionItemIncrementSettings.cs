@@ -3,7 +3,7 @@
 // Module Name: SolutionItemIncrementSettings.cs
 // ----------------------------------------------------------------------
 // Created and maintained by Paul J. Melia.
-// Copyright © 2016 Paul J. Melia.
+// Copyright © 2019 Paul J. Melia.
 // All rights reserved.
 // ----------------------------------------------------------------------
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
@@ -23,21 +23,20 @@ namespace BuildVersionIncrement.Model
 {
 	using System;
 	using System.ComponentModel;
-	using System.Drawing.Design;
 	using System.IO;
-	using System.Windows.Forms.Design;
 
 	using Logging;
+
 	using Microsoft.VisualStudio.Shell;
+
 	using Properties;
 
 	using UI;
 
-	using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
-
 	internal class SolutionItemIncrementSettings : IncrementSettingsBase
 	{
 		private string _assemblyInfoFilename = string.Empty;
+		private string _vsixmanifestFilename = string.Empty;
 
 		public SolutionItemIncrementSettings(SolutionItem solutionItem)
 		{
@@ -45,15 +44,14 @@ namespace BuildVersionIncrement.Model
 		}
 
 		[Category("Increment Settings")]
-		[Description(
-			"Use this value if the assembly attributes aren't saved in the default file. "
-			+ "You can use this at solution level if you make use of file links in your projects.")]
+		[Description("Use this value if the assembly attributes aren't saved in the default file. "
+		             + "You can use this at solution level if you make use of file links in your projects.")]
 		[DefaultValue("")]
 		[DisplayName("Assembly Info Filename")]
 		[Editor(typeof(FilePickerEditor), typeof(FilePickerEditor))]
 		public string AssemblyInfoFilename
 		{
-			get { return _assemblyInfoFilename; }
+			get => _assemblyInfoFilename;
 			set
 			{
 				if (!string.IsNullOrEmpty(value))
@@ -68,10 +66,34 @@ namespace BuildVersionIncrement.Model
 			}
 		}
 
+		[Category("Increment Settings")]
+		[Description(
+			"Use this to specify the vsixmanifest file to update if the option to update vsixmanifest files is chacked")]
+		[DefaultValue("")]
+		[DisplayName("vsixmanifest Filename")]
+		[Editor(typeof(FilePickerEditor), typeof(FilePickerEditor))]
+		public string VsixmanifestFilename
+		{
+			get => _vsixmanifestFilename;
+			set
+			{
+				if (!string.IsNullOrEmpty(value))
+				{
+					var basePath = Path.GetDirectoryName(SolutionItem.Filename);
+					_vsixmanifestFilename = Common.MakeRelativePath(basePath, value);
+				}
+				else
+				{
+					_vsixmanifestFilename = string.Empty;
+				}
+			}
+		}
+
 		[Category("Condition")]
 		[DefaultValue("Any")]
 		[DisplayName("Configuration Name")]
-		[Description("Set this to the name to of the configuration when the auto update should occur.")]
+		[Description(
+			"Set this to the name to of the configuration when the auto update should occur.")]
 		[TypeConverter(typeof(ConfigurationStringConverter))]
 		public string ConfigurationName { get; set; } = "Any";
 
@@ -82,11 +104,10 @@ namespace BuildVersionIncrement.Model
 		public string Filename => SolutionItem.Filename;
 
 #if DEBUG
-
 		[ReadOnly(true)]
 		[Category("Project")]
 		[DisplayName("Project Kind")]
-		[ItemsSource(typeof(ProjectKindItemsSource))]
+		//[ItemsSource(typeof(ProjectKindItemsSource))]
 		public string Guid
 		{
 			get
@@ -119,76 +140,95 @@ namespace BuildVersionIncrement.Model
 			{
 				return;
 			}
+
 			var solutionItemSettings = (SolutionItemIncrementSettings)source;
 			AssemblyInfoFilename = solutionItemSettings.AssemblyInfoFilename;
+			VsixmanifestFilename = solutionItemSettings.VsixmanifestFilename;
 			ConfigurationName = solutionItemSettings.ConfigurationName;
 			UseGlobalSettings = solutionItemSettings.UseGlobalSettings;
 		}
 
 		public override void Load()
 		{
-			Microsoft.VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();
+			ThreadHelper.ThrowIfNotOnUIThread();
 			try
 			{
 				var versioningStyle = GlobalVariables.GetGlobalVariable(SolutionItem.Globals,
 				                                                        Resources
 					                                                        .GlobalVarName_buildVersioningStyle,
-				                                                        VersioningStyle.GetDefaultGlobalVariable
-					                                                        ());
+				                                                        VersioningStyle
+					                                                        .GetDefaultGlobalVariable());
 				VersioningStyle.FromGlobalVariable(versioningStyle);
 				AutoUpdateAssemblyVersion =
 					bool.Parse(GlobalVariables.GetGlobalVariable(SolutionItem.Globals,
-					                                             Resources.GlobalVarName_updateAssemblyVersion,
+					                                             Resources
+						                                             .GlobalVarName_updateAssemblyVersion,
 					                                             "false"));
 				AutoUpdateFileVersion =
 					bool.Parse(GlobalVariables.GetGlobalVariable(SolutionItem.Globals,
-					                                             Resources.GlobalVarName_updateFileVersion,
+					                                             Resources
+						                                             .GlobalVarName_updateFileVersion,
 					                                             "false"));
+
+				//AutoUpdateVsixmanifestVersion = bool.Parse(
+				//	GlobalVariables.GetGlobalVariable(SolutionItem.Globals,
+				//	                                  Resources
+				//		                                  .GlobalVarName_updateVsixmanifestVersion,
+				//	                                  "false"));
 				try
 				{
-					BuildAction =
-						(BuildActionType)
-						Enum.Parse(typeof(BuildActionType),
-						           GlobalVariables.GetGlobalVariable(SolutionItem.Globals,
-						                                             Resources.GlobalVarName_buildAction,
-						                                             "Both"));
+					BuildAction = (BuildActionType)Enum.Parse(
+						typeof(BuildActionType),
+						GlobalVariables.GetGlobalVariable(SolutionItem.Globals,
+						                                  Resources.GlobalVarName_buildAction,
+						                                  "Both"));
 				}
 				catch (ArgumentException)
 				{
 					BuildAction = BuildActionType.Both;
 				}
-				StartDate =
-					DateTime.Parse(GlobalVariables.GetGlobalVariable(SolutionItem.Globals,
-					                                                 Resources.GlobalVarName_startDate,
-					                                                 "2000/01/01"));
+
+				StartDate = DateTime.Parse(GlobalVariables.GetGlobalVariable(
+					                           SolutionItem.Globals,
+					                           Resources.GlobalVarName_startDate,
+					                           "2000/01/01"));
 				ReplaceNonNumerics =
 					bool.Parse(GlobalVariables.GetGlobalVariable(SolutionItem.Globals,
-					                                             Resources.GlobalVarName_replaceNonNumerics,
+					                                             Resources
+						                                             .GlobalVarName_replaceNonNumerics,
 					                                             "true"));
 				IncrementBeforeBuild =
 					bool.Parse(GlobalVariables.GetGlobalVariable(SolutionItem.Globals,
-					                                             Resources.GlobalVarName_incrementBeforeBuild,
+					                                             Resources
+						                                             .GlobalVarName_incrementBeforeBuild,
 					                                             "true"));
 				AssemblyInfoFilename = GlobalVariables.GetGlobalVariable(SolutionItem.Globals,
 				                                                         Resources
 					                                                         .GlobalVarName_assemblyInfoFilename,
 				                                                         "");
+				VsixmanifestFilename = GlobalVariables.GetGlobalVariable(
+					SolutionItem.Globals,
+					Resources.GlobalVarName_vsixmanifestFilename,
+					"");
 				ConfigurationName = GlobalVariables.GetGlobalVariable(SolutionItem.Globals,
-				                                                      Resources.GlobalVarName_configurationName,
+				                                                      Resources
+					                                                      .GlobalVarName_configurationName,
 				                                                      "Any");
-				UseGlobalSettings =
-					bool.Parse(GlobalVariables.GetGlobalVariable(SolutionItem.Globals,
-					                                             Resources.GlobalVarName_useGlobalSettings,
-					                                             (GlobalIncrementSettings.ApplySettings
-					                                              == GlobalIncrementSettings.ApplyGlobalSettings
-					                                                                        .AsDefault).ToString()));
-				IsUniversalTime =
-					bool.Parse(GlobalVariables.GetGlobalVariable(SolutionItem.Globals,
-					                                             Resources.GlobalVarName_useUniversalClock,
-					                                             "false"));
+				UseGlobalSettings = bool.Parse(GlobalVariables.GetGlobalVariable(
+					                               SolutionItem.Globals,
+					                               Resources.GlobalVarName_useGlobalSettings,
+					                               (GlobalIncrementSettings.ApplySettings
+					                                == GlobalIncrementSettings.ApplyGlobalSettings
+					                                                          .AsDefault)
+					                               .ToString()));
+				IsUniversalTime = bool.Parse(GlobalVariables.GetGlobalVariable(
+					                             SolutionItem.Globals,
+					                             Resources.GlobalVarName_useUniversalClock,
+					                             "false"));
 				DetectChanges =
 					bool.Parse(GlobalVariables.GetGlobalVariable(SolutionItem.Globals,
-					                                             Resources.GlobalVarName_detectChanges,
+					                                             Resources
+						                                             .GlobalVarName_detectChanges,
 					                                             "true"));
 			}
 			catch (Exception ex)
@@ -205,11 +245,14 @@ namespace BuildVersionIncrement.Model
 			VersioningStyle.FromGlobalVariable(versioningStyle);
 			AutoUpdateAssemblyVersion = false;
 			AutoUpdateFileVersion = false;
+			//AutoUpdateVsixmanifestVersion = false;
 			BuildAction = BuildActionType.Both;
 			StartDate = new DateTime(2000, 1, 1);
 			ReplaceNonNumerics = true;
 			IncrementBeforeBuild = true;
-			AssemblyInfoFilename = String.Empty;
+			AssemblyInfoFilename = string.Empty;
+			VsixmanifestFilename = string.Empty;
+
 			ConfigurationName = "Any";
 			UseGlobalSettings = false;
 			IsUniversalTime = false;
@@ -218,7 +261,7 @@ namespace BuildVersionIncrement.Model
 
 		public override void Save()
 		{
-			Microsoft.VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();
+			ThreadHelper.ThrowIfNotOnUIThread();
 			GlobalVariables.SetGlobalVariable(SolutionItem.Globals,
 			                                  Resources.GlobalVarName_buildVersioningStyle,
 			                                  VersioningStyle.ToGlobalVariable(),
@@ -231,6 +274,10 @@ namespace BuildVersionIncrement.Model
 			                                  Resources.GlobalVarName_updateFileVersion,
 			                                  AutoUpdateFileVersion.ToString(),
 			                                  "false");
+			//GlobalVariables.SetGlobalVariable(SolutionItem.Globals,
+			//                                  Resources.GlobalVarName_updateVsixmanifestVersion,
+			//                                  AutoUpdateVsixmanifestVersion.ToString(),
+			//                                  "false");
 			GlobalVariables.SetGlobalVariable(SolutionItem.Globals,
 			                                  Resources.GlobalVarName_buildAction,
 			                                  BuildAction.ToString(),
